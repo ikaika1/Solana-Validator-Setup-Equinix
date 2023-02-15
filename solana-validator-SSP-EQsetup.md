@@ -1,4 +1,5 @@
 # Solana Validator Node configuration for Equinix Metal
+仮想vps版
 
 Make sure and check out the README document.
 
@@ -12,7 +13,44 @@ First things first - OS security updates
 apt update
 apt upgrade
 apt dist-upgrade
+
 ```
+
+このままだと一定時間放置すると接続切断されてしまうのでタイムアウトしないように変更
+
+```
+nano /etc/ssh/sshd_config
+```
+
+以下を/etc/ssh/sshd_configの最後に追加
+```
+ClientAliveInterval 120
+ClientAliveCountMax 3
+```
+
+追加したらSSHを再起動
+```
+systemctl restart sshd
+
+```
+
+そしてdf -hをすると
+```/dev/vdb    /mnt/data```
+ 
+と1.8GBのssdがマウントされてしまっているので
+
+```sudo umount /dev/vdb```
+
+でアンマウント
+
+```
+sudo mkdir /mt
+sudo mount /dev/vdb /mt
+```
+
+でmtというフォルダを作りvdbにマウント
+
+
 create user sol
 
 ```
@@ -22,108 +60,30 @@ usermod -aG sudo sol
 
 su - sol
 ```
+ 
+/etc/fstab
 
-Partition NVME into ~570gb (swap) and 3000gb (ledger and accounts) - for EQ1 Spec 3.8TB NVME
-
-Adding new process using GPT partition with gdisk for larger filessytems.
-
-Enter the "n" then hit enter
-Enter the "1" then hit enter...and so on
-```
-sudo gdisk /dev/nvme0n1
-n, 1, enter (2048 default first sector), +3000G, enter (8300 default), n, 2, enter (default first available sector), enter (max sector available), 8200, w, y
-```
-
-Now make filesystems, directories, delete and make new swap, etc.
-```
-sudo fdisk -l 
-
-sudo mkfs -t ext4 /dev/nvme0n1p1
-
-sudo mount /dev/nvme0n1p1 /mt
-
-sudo mkswap /dev/nvme0n1p2
-
-```
-Discover the old swap directory, turn it off, and turn it on the new one.
-```
-sudo swapon --show
-```
-You need to look at the directory and pick the correct /dev/sd*
-
-It could be /dev/sdb2 or /dev/sdc2 so edit the next line below to the proper sd**
-
-It will almost always be the one showig 1.9GB of swap size
-```
-sudo swapoff /dev/sda2
-```
-Next is editing the swappiness to 10 and turning our new swap partition on.
-```
-echo 'vm.swappiness=10' | sudo tee --append /etc/sysctl.conf > /dev/null
-
-sudo sysctl -p
-
-sudo swapon /dev/nvme0n1p2
-```
-Capture nvme0n1p1 and nvme0n1p2 UUIDs to edit into /etc/fstab
-
-Let's take a look at the file first to get an idea of what is needed here.
+を編集
 ```
 sudo nano /etc/fstab
 ```
-You should see something similar to this:
-UUID=e6eafc79-85c3-4208-82ac-41b73d75cd31       /       ext4    errors=remount-ro       0       1
-UUID=4b8f8a7b-8b8f-4984-a341-5770f8b365a1       none    swap    none    0       0
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/vda2 during curtin installation
+/dev/disk/by-uuid/6bf8da24-140f-462f-8762-0dff5d6946fd / ext4 defaults 0 0
+/swap.img       none    swap    sw      0       0
 
-These are the default OS drives and we will be modifying swap later. Do **not** modify the entry of root, the ext4 partition mounted at /. You will need to use the UUID's of the two partitions you just made (nvmeon1p1 and nvme0n1p2).
+/dev/vdb /mt                     ext4     auto nosuid,nodev,nofail 0 0
 
-`ctrl + x` to exit
-
-```
-lsblk -f
-```
-Copy the section that looks similar to the below nvme0n1 partition tree and past it into a notepad (or VScode, etc) so that you can copy/past into fstab properly. We just need the UUID's so in the example below copy "5c24e241-239c-4aa5-baa6-fbb6fb44a847" and "37215cf2-244c-4f2e-98f9-6f327694fe7e" and note which partition each belongs to (/mt and swap respectively). Your UUIDs will be different!
-```
-nvme0n1
-├─nvme0n1p1 ext4         5c24e241-239c-4aa5-baa6-fbb6fb44a847    2.8T     0% /mt
-└─nvme1n1p2 swap   1     37215cf2-244c-4f2e-98f9-6f327694fe7e                [SWAP]
-```
-These UUID above need to be edited into the fstab config below
-```
-sudo nano /etc/fstab
-```
-Leave the first UUID alone (OS related), on the swap partition line, while your UUID values will be different, edit the previous one to have your new UUID similar to from
-```
-UUID=4b8f8a7b-8b8f-4984-a341-5770f8b365a1       none    swap    none    0       0
-```
-To be updated becoming
-```
-UUID=37215cf2-244c-4f2e-98f9-6f327694fe7e       none    swap    none    0       0
-```
-  Now **append these lines under whatever current UUIDs are listed** as the ones already in the file are boot/OS related.
-also make sure UUID is correct as they can change
-
-```
-#Validator config
-UUID=5c24e241-239c-4aa5-baa6-fbb6fb44a847 /mt  auto nosuid,nodev,nofail 0 0
-#ramdrive and swap
 tmpfs /mnt/ramdrive tmpfs rw,size=80G 0 0
 ```
-save / exit  
-
-`ctrl + o`, enter, `ctrl + x`   
-
-The complete file should look like this (but with your own UUIDs):
-```
-UUID=e6eafc79-85c3-4208-82ac-41b73d75cd31       /       ext4    errors=remount-ro       0       1
-UUID=37215cf2-244c-4f2e-98f9-6f327694fe7e       none    swap    none    0       0
-#Validator config
-UUID=5c24e241-239c-4aa5-baa6-fbb6fb44a847 /mt  auto nosuid,nodev,nofail 0 0
-#ramdrive and swap
-tmpfs /mnt/ramdrive tmpfs rw,size=80G 0 0
-```
-
-Create the ramdrive folder and mount everything.
+   
+ Create the ramdrive folder and mount everything.
 ```
 sudo mkdir /mnt/ramdrive
 
@@ -158,7 +118,7 @@ Open ports in UFW firewall for Solana Validator operation:
 ```
 sudo ufw allow 53 
 
-sudo ufw allow 8000:8010/udp
+sudo ufw allow 8000:8020/udp
 ```
 
 Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 2/4/2022)
