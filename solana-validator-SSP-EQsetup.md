@@ -67,6 +67,8 @@ su - sol
 ```
 sudo nano /etc/fstab
 ```
+
+```
 # /etc/fstab: static file system information.
 #
 # Use 'blkid' to print the universally unique identifier for a
