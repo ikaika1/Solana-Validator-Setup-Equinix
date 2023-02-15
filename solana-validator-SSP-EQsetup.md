@@ -1,5 +1,5 @@
 # Solana Validator Node configuration for Equinix Metal
-仮想vps版
+仮想サーバー版
 
 Make sure and check out the README document.
 
