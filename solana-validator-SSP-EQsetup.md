@@ -167,7 +167,7 @@ solana-keygen new --outfile ~/authority-keypair.json
 solana-keygen new -o ~/vote-account-keypair.json
 ```
 
-validator-keypair.jsonについては登録してテストネットのキーペアで復元
+validator-keypair.jsonについてはtds22に登録したテストネットのキーペアを復元
 ```
 solana-keygen recover -o ~/validator-keypair.json
 
