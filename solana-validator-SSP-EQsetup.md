@@ -163,9 +163,14 @@ You will need a little bit of SOL in `validator-keypair.json` and if you want to
 ```
 solana-keygen new --outfile ~/authority-keypair.json
 
-solana-keygen new -o ~/validator-keypair.json
 
 solana-keygen new -o ~/vote-account-keypair.json
+```
+
+validator-keypair.jsonについては登録してテストネットのキーペアで復元
+```
+solana-keygen recover -o ~/validator-keypair.json
+
 ```
 OPTIONAL
 ```
@@ -199,27 +204,28 @@ Edit this into start-validator.sh ( updated 02/07/2022):
 exec solana-validator \
 --identity ~/validator-keypair.json \
 --vote-account ~/vote-account-keypair.json \
---authorized-voter ~/vote-account-keypair.json \
---entrypoint entrypoint.mainnet-beta.solana.com:8001 \
---entrypoint entrypoint2.mainnet-beta.solana.com:8001 \
---entrypoint entrypoint3.mainnet-beta.solana.com:8001 \
---entrypoint entrypoint4.mainnet-beta.solana.com:8001 \
---entrypoint entrypoint5.mainnet-beta.solana.com:8001 \
---trusted-validator DDnAqxJVFo2GVTujibHt5cjevHMSE9bo8HJaydHoshdp \
---trusted-validator Ninja1spj6n9t5hVYgF3PdnYz2PLnkt7rvaw3firmjs \
---trusted-validator wWf94sVnaXHzBYrePsRUyesq6ofndocfBH6EmzdgKMS \
---trusted-validator 7cVfgArCheMR6Cs4t6vz5rfnqd56vZq4ndaBrY5xkxXy \
---expected-genesis-hash 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d \
+--entrypoint 5.9.35.85:8001 \
+--entrypoint entrypoint.testnet.solana.com:8001 \
+--entrypoint entrypoint2.testnet.solana.com:8001 \
+--entrypoint entrypoint3.testnet.solana.com:8001 \
+--known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
+--known-validator dDzy5SR3AXdYWVqbDEkVFdvSPCtS9ihF5kJkHCtXoFs \
+--known-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQADN \
+--known-validator eoKpUABi59aT4rR9HGS3LcMecfut9x7zJyodWWP43YQ \
+--known-validator 9QxCLckBiJc783jnMvXZubK4wH86Eqqvashtrwvcsgkv \
+--expected-genesis-hash 4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY \
 --ledger /mt/ledger/validator-ledger \
---dynamic-port-range 8000-8010 \
---private-rpc \
+--log /home/sol/log/solana-validator.log \
+--accounts /mt/solana-accounts \
+--limit-ledger-size \
+--dynamic-port-range 8000-8020 \
 --rpc-bind-address 127.0.0.1 \
---no-untrusted-rpc \
---expected-shred-version 13490 \
+--rpc-port 8899 \
 --wal-recovery-mode skip_any_corrupted_record \
---log ~/solana-validator.log \
---accounts /mnt/ramdrive/solana-accounts \
---limit-ledger-size 50000000 \
+--no-port-check \
+--no-os-network-limits-test \
+--no-check-vote-account
+
 ```
 save / exit (ctrl+s, ctrl+x)
 
@@ -242,18 +248,19 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-Restart=on-failure
+Restart=always
 RestartSec=1
 LimitNOFILE=1000000
 LogRateLimitIntervalSec=0
 User=sol
 Environment=PATH=/bin:/usr/bin:/home/sol/.local/share/solana/install/active_release/bin
-Environment=SOLANA_METRICS_CONFIG=host=https://metrics.solana.com:8086,db=mainnet-beta,u=mainnet-beta_write,p=password
 WorkingDirectory=/home/sol/
+Environment="SOLANA_METRICS_CONFIG=host=https://metrics.solana.com:8086,db=tds,u=testnet_write,p=c4fa841aa918bf8274e3e2a44d77568d9861b3ea"
 ExecStart=/home/sol/start-validator.sh
 
 [Install]
 WantedBy=multi-user.target
+
 ```
 save/exit (:wq)
 
@@ -274,6 +281,7 @@ LogRateLimitIntervalSec=0
 ExecStart=/home/sol/.local/share/solana/install/active_release/bin/solana-sys-tuner --user sol
 [Install]
 WantedBy=multi-user.target
+
 ```
 
 ```
