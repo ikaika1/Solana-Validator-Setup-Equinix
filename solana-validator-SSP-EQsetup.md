@@ -121,6 +121,10 @@ Open ports in UFW firewall for Solana Validator operation:
 sudo ufw allow 53 
 
 sudo ufw allow 8000:8020/udp
+
+sudo ufw allow 8899
+
+sudo ufw allow 8200
 ```
 
 Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 2/4/2022)
@@ -219,7 +223,6 @@ exec solana-validator \
 --accounts /mt/solana-accounts \
 --limit-ledger-size \
 --dynamic-port-range 8000-8020 \
---rpc-bind-address 127.0.0.1 \
 --rpc-port 8899 \
 --wal-recovery-mode skip_any_corrupted_record \
 --no-port-check \
