@@ -125,18 +125,28 @@ sudo ufw allow 8000:8020/udp
 sudo ufw allow 8899
 
 sudo ufw allow 8200
+
+sudo ufw allow 11228
+
+sudo ufw allow 11229
 ```
 
 Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 2/4/2022)
 
 ```
 mkdir -p /home/sol/.local/share/solana/install/active_release/bin
+
 ln -s /home/sol/.local/share/solana/install/releases/v1.18.25-jito-mod/bin /home/sol/.local/share/solana/install/active_release/bin
 ```
 I will ask you to map the PATH just copy and paste the below:
 
 ```
 export PATH="/home/sol/.local/share/solana/install/active_release/bin:$PATH"
+
+echo 'export PATH="/home/sol/.local/share/solana/install/active_release/bin:$PATH"' >> ~/.bashrc
+
+source ~/.bashrc
+
 ```
 You are now able to join Solana gossip which is an overarching network communication layer which all RPCs and Validators chatter in. If you see a steam of logs, and no errors then have officially connected directly to the Solana network.
 
@@ -205,30 +215,30 @@ sudo nano ~/start-validator.sh
 ```
 Edit this into start-validator.sh ( updated 02/07/2022):
 ```
-#!/bin/bash
 exec solana-validator \
---identity ~/validator-keypair.json \
---vote-account ~/vote-account-keypair.json \
---entrypoint 5.9.35.85:8001 \
---entrypoint entrypoint.testnet.solana.com:8001 \
---entrypoint entrypoint2.testnet.solana.com:8001 \
---entrypoint entrypoint3.testnet.solana.com:8001 \
---known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
---known-validator dDzy5SR3AXdYWVqbDEkVFdvSPCtS9ihF5kJkHCtXoFs \
---known-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQADN \
---known-validator eoKpUABi59aT4rR9HGS3LcMecfut9x7zJyodWWP43YQ \
---known-validator 9QxCLckBiJc783jnMvXZubK4wH86Eqqvashtrwvcsgkv \
---expected-genesis-hash 4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY \
---ledger /mt/ledger/validator-ledger \
---log /home/sol/log/solana-validator.log \
---accounts /mt/solana-accounts \
---limit-ledger-size \
---dynamic-port-range 8000-8020 \
---rpc-port 8899 \
---wal-recovery-mode skip_any_corrupted_record \
---no-port-check \
---no-os-network-limits-test \
---no-check-vote-account
+    --identity validator-keypair.json \
+    --vote-account vote-account-keypair.json \
+    --known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
+    --known-validator 7XSY3MrYnK8vq693Rju17bbPkCN3Z7KvvfvJx4kdrsSY \
+    --known-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQADN \
+    --known-validator 9QxCLckBiJc783jnMvXZubK4wH86Eqqvashtrwvcsgkv \
+    --only-known-rpc \
+    --log /home/sol/solana-validator.log \
+    --ledger /mnt/ledger \
+    --rpc-port 8899 \
+    --dynamic-port-range 8000-8020 \
+    --entrypoint entrypoint.testnet.solana.com:8001 \
+    --entrypoint entrypoint2.testnet.solana.com:8001 \
+    --entrypoint entrypoint3.testnet.solana.com:8001 \
+    --expected-genesis-hash 4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY \
+    --wal-recovery-mode skip_any_corrupted_record \
+    --limit-ledger-size \
+    --relayer-url http://127.0.0.1:11226 \
+    --private-rpc \
+    --full-rpc-api \
+    --rpc-port 8899 \
+    --account-index program-id \
+    --account-index-include-key AddressLookupTab1e1111111111111111111111111 \
 
 ```
 save / exit (ctrl+s, ctrl+x)
@@ -247,19 +257,18 @@ Edit this into file:
 [Unit]
 Description=Solana Validator
 After=network.target
-Wants=systuner.service
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=1
+User=sol
 LimitNOFILE=1000000
 LogRateLimitIntervalSec=0
-User=sol
-Environment=PATH=/bin:/usr/bin:/home/sol/.local/share/solana/install/active_release/bin
+Environment="PATH=/bin:/usr/bin:/home/sol/.local/share/solana/install/active_release/bin"
 WorkingDirectory=/home/sol/
-Environment="SOLANA_METRICS_CONFIG=host=https://metrics.solana.com:8086,db=tds,u=testnet_write,p=c4fa841aa918bf8274e3e2a44d77568d9861b3ea"
+Environment=SOLANA_METRICS_CONFIG=host=https://metrics.solana.com:8086,db=mainnet-beta,u=mainnet-beta_write,p=password
 ExecStart=/home/sol/start-validator.sh
 
 [Install]
@@ -270,26 +279,24 @@ save/exit (:wq)
 
 make system tuner service - systuner.service
 ```
-sudo nano /etc/systemd/system/systuner.service
-```
-Edit this into file:
-```
-[Unit]
-Description=Solana System Tuner
-After=network.target
-[Service]
-Type=simple
-Restart=on-failure
-RestartSec=1
-LogRateLimitIntervalSec=0
-ExecStart=/home/sol/.local/share/solana/install/active_release/bin/solana-sys-tuner --user sol
-[Install]
-WantedBy=multi-user.target
+sudo bash -c "cat >/etc/sysctl.d/21-solana-validator.conf <<EOF
+# Increase UDP buffer sizes
+net.core.rmem_default = 134217728
+net.core.rmem_max = 134217728
+net.core.wmem_default = 134217728
+net.core.wmem_max = 134217728
+
+# Increase memory mapped files limit
+vm.max_map_count = 1000000
+
+# Increase number of allowed open file descriptors
+fs.nr_open = 1000000
+EOF"
 
 ```
 
 ```
-sudo systemctl daemon-reload
+sudo sysctl -p /etc/sysctl.d/21-solana-validator.conf
 ```
 Set up log rotation for ~/log/solana-validator.log
 ```
