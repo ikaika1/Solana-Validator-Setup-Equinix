@@ -130,7 +130,8 @@ sudo ufw allow 8200
 Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 2/4/2022)
 
 ```
-sh -c "$(curl -sSfL https://release.solana.com/v1.8.14/install)"
+mkdir -p /home/sol/.local/share/solana/install/active_release/bin
+ln -s /home/sol/.local/share/solana/install/releases/v1.18.25-jito-mod/bin /home/sol/.local/share/solana/install/active_release/bin
 ```
 I will ask you to map the PATH just copy and paste the below:
 
