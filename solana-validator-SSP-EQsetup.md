@@ -120,15 +120,20 @@ Open ports in UFW firewall for Solana Validator operation:
 ```
 sudo ufw allow 53 
 
-sudo ufw allow 8000:8020/udp
+sudo ufw allow 22/tcp && \
+sudo ufw allow 53/tcp && \
+sudo ufw allow 53/udp && \
+sudo ufw allow 8899/tcp && \
+sudo ufw allow 8899/udp && \
+sudo ufw allow 8000:8898/tcp && \
+sudo ufw allow 8000:8898/udp && \
+sudo ufw allow 8900:9999/tcp && \
+sudo ufw allow 8900:9999/udp && \
+sudo ufw allow 10000/tcp && \
+sudo ufw allow 10000/udp && \
+sudo ufw reload && \
+sudo ufw status
 
-sudo ufw allow 8899
-
-sudo ufw allow 8200
-
-sudo ufw allow 11228
-
-sudo ufw allow 11229
 ```
 
 Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 2/4/2022)
