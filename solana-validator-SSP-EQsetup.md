@@ -217,7 +217,7 @@ Edit this into start-validator.sh ( updated 02/07/2022):
 ```
 exec solana-validator \
     --identity validator-keypair.json \
-    --vote-account vote-account-keypair.json \
+    --vote-account mainnet-vote-account-keypair.json \
     --known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
     --known-validator 7XSY3MrYnK8vq693Rju17bbPkCN3Z7KvvfvJx4kdrsSY \
     --known-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQADN \
@@ -333,8 +333,9 @@ ctrl+c
 ```
 if the service did not kickstart then debug, otherwise continue to make into system services:
 ```
-sudo systemctl enable --now systuner.service
-sudo systemctl status systuner.service
+ln -s dammy-validator-keypair.json validator-keypair.json
+sudo systemctl start sol.service
+sudo systemctl status logrotate
 sudo systemctl enable --now sol.service
 sudo systemctl status sol.service
 ```
