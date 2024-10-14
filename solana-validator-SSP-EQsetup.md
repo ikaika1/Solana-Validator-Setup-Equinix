@@ -220,19 +220,14 @@ sudo nano ~/start-validator.sh
 ```
 Edit this into start-validator.sh ( updated 02/07/2022):
 ```
-BLOCK_ENGINE_URL=https://amsterdam.mainnet.block-engine.jito.wtf
-SHRED_RECEIVER_ADDR=74.118.140.240:1002
-RELAYER_URL=http://amsterdam.mainnet.relayer.jito.wtf:8100
-
-
 exec solana-validator \
     --tip-payment-program-pubkey T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt \
     --tip-distribution-program-pubkey 4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7 \
     --merkle-root-upload-authority GZctHpWXmsZC1YHACTGGcHhYxjdRqQvTpYkb9LMvxDib \
-	   --commission-bps 800 \
-    --relayer-url ${RELAYER_URL} \
-    --block-engine-url ${BLOCK_ENGINE_URL} \
-    --shred-receiver-address ${SHRED_RECEIVER_ADDR} \
+    --commission-bps 800 \
+    --relayer-url https://amsterdam.mainnet.block-engine.jito.wtf \
+    --block-engine-url 74.118.140.240:1002 \
+    --shred-receiver-address http://amsterdam.mainnet.relayer.jito.wtf:8100 \
     --identity validator-keypair.json \
     --vote-account mainnet-vote-account-keypair.json \
     --known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
