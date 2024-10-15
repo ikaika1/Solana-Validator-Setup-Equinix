@@ -220,29 +220,34 @@ sudo nano ~/start-validator.sh
 ```
 Edit this into start-validator.sh ( updated 02/07/2022):
 ```
+#!/bin/bash
+BLOCK_ENGINE_URL=https://amsterdam.mainnet.block-engine.jito.wtf
+SHRED_RECEIVER_ADDR=74.118.140.240:1002
+RELAYER_URL=http://amsterdam.mainnet.relayer.jito.wtf:8100
 exec solana-validator \
     --tip-payment-program-pubkey T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt \
     --tip-distribution-program-pubkey 4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7 \
     --merkle-root-upload-authority GZctHpWXmsZC1YHACTGGcHhYxjdRqQvTpYkb9LMvxDib \
-    --commission-bps 800 \
-    --relayer-url https://amsterdam.mainnet.block-engine.jito.wtf \
-    --block-engine-url 74.118.140.240:1002 \
-    --shred-receiver-address http://amsterdam.mainnet.relayer.jito.wtf:8100 \
+    --commission-bps 1000 \
+    --relayer-url ${RELAYER_URL} \
+    --block-engine-url ${BLOCK_ENGINE_URL} \
+    --shred-receiver-address ${SHRED_RECEIVER_ADDR} \
     --identity validator-keypair.json \
     --vote-account mainnet-vote-account-keypair.json \
-    --known-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
-    --known-validator 7XSY3MrYnK8vq693Rju17bbPkCN3Z7KvvfvJx4kdrsSY \
-    --known-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQADN \
-    --known-validator 9QxCLckBiJc783jnMvXZubK4wH86Eqqvashtrwvcsgkv \
-    --only-known-rpc \
+    --known-validator Certusm1sa411sMpV9FPqU5dXAYhmmhygvxJ23S6hJ24 \
+    --known-validator 7Np41oeYqPefeNQEHSv1UDhYrehxin3NStELsSKCT4K2 \
+    --known-validator GdnSyH3YtwcxFvQrVVJMm1JhTS4QVX7MFsX56uJLUfiZ \
+    --known-validator CakcnaRDHka2gXyfbEd2d3xsvkJkqsLw2akB3zsN1D2S \
+    --expected-genesis-hash 5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d \
     --log /home/sol/solana-validator.log \
     --ledger /mnt/ledger \
     --rpc-port 8899 \
     --dynamic-port-range 8000-8020 \
-    --entrypoint entrypoint.testnet.solana.com:8001 \
-    --entrypoint entrypoint2.testnet.solana.com:8001 \
-    --entrypoint entrypoint3.testnet.solana.com:8001 \
-    --expected-genesis-hash 4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY \
+    --entrypoint entrypoint.mainnet-beta.solana.com:8001 \
+    --entrypoint entrypoint2.mainnet-beta.solana.com:8001 \
+    --entrypoint entrypoint3.mainnet-beta.solana.com:8001 \
+    --entrypoint entrypoint4.mainnet-beta.solana.com:8001 \
+    --entrypoint entrypoint5.mainnet-beta.solana.com:8001 \
     --wal-recovery-mode skip_any_corrupted_record \
     --limit-ledger-size \
 
