@@ -65,7 +65,7 @@ su - sol
 
 を編集
 ```
-sudo nano /etc/fstab
+
 ```
 
 ```
@@ -80,7 +80,9 @@ sudo nano /etc/fstab
 /dev/disk/by-uuid/6bf8da24-140f-462f-8762-0dff5d6946fd / ext4 defaults 0 0
 /swap.img       none    swap    sw      0       0
 
-/dev/vdb /mt                     ext4     auto nosuid,nodev,nofail 0 0
+/dev/nvme0n1 /mnt/ledger                     ext4     auto nosuid,nodev,nofail 0 0
+
+/dev/nvme1n1 /mnt/accounts                     ext4     auto nosuid,nodev,nofail 0 0
 
 tmpfs /mnt/ramdrive tmpfs rw,size=80G 0 0
 ```
@@ -93,16 +95,15 @@ sudo mount --all --verbose
 ```
 Finish making directories
 ```
-sudo mkdir -p /mt/ledger/validator-ledger
+sudo mkdir -p /mnt/ledger
 
-sudo mkdir /mt/solana-accounts
+sudo mkdir -p /mnt/accounts
 
-sudo mkdir ~/log
 ```
 
 Edit permissions and make sure user sol is the owner for solana directories
 ```
-sudo chown -R sol:sol /mt/*
+sudo chown -R sol:sol /mnt/*
 
 sudo chown sol:sol ~/log
 ```
