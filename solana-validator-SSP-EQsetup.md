@@ -406,7 +406,7 @@ sudo systemctl status sol.service
 ```
 This starts the system process and the Validator should begin running. Debug if not by tailing the log and filter for error of warnings.
 ```
-sudo tail -f ~/log/solana-validator.log
+sudo tail -f ./solana-validator.log
 ```
 ### **If you have not done so already, join the Solana Discord and get help in the "validator-support" channel.**
 
