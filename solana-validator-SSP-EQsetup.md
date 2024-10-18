@@ -288,6 +288,7 @@ exec solana-validator \
     --shred-receiver-address ${SHRED_RECEIVER_ADDR} \
     --identity validator-keypair.json \
     --vote-account mainnet-vote-account-keypair.json \
+    --authorized-voter  /home/sol/mainnet-validator-keypair.json 
     --known-validator Certusm1sa411sMpV9FPqU5dXAYhmmhygvxJ23S6hJ24 \
     --known-validator 7Np41oeYqPefeNQEHSv1UDhYrehxin3NStELsSKCT4K2 \
     --known-validator GdnSyH3YtwcxFvQrVVJMm1JhTS4QVX7MFsX56uJLUfiZ \
