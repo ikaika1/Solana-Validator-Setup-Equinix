@@ -187,7 +187,7 @@ Install the Solana CLI! Don't forget to check for current version (1.8.14 as of 
 ```
 mkdir -p /home/sol/.local/share/solana/install/active_release/bin
 
-ln -s /home/sol/.local/share/solana/install/releases/v1.18.25-jito-mod/bin /home/sol/.local/share/solana/install/active_release/bin
+ln -s /home/sol/.local/share/solana/install/releases/v1.18.25-jito-mod/bin /home/sol/.local/share/solana/install/active_release
 ```
 I will ask you to map the PATH just copy and paste the below:
 
