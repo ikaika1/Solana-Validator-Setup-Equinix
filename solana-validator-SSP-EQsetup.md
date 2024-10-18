@@ -226,6 +226,14 @@ You will need a little bit of SOL in `validator-keypair.json` and if you want to
 #
 
 ### Make keys!
+
+```
+solana-keygen new --o ~/dammy-keypair.json
+
+
+ln -s dammy-keypair.json validator-keypair.json
+```
+
 ```
 solana-keygen new --outfile ~/authority-keypair.json
 
