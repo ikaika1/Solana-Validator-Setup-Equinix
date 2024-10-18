@@ -459,4 +459,4 @@ Solanaクライアントのバージョンによっては、互換性がない�
 --version VERSION     search for a snapshot from a specific version node 
 
 動作しない場合は、クライアント バージョンと互換性のある RPC を検索し、手動でダウンロードできます (たとえば、wget を使用) — https://solana.rpc-finder.com/
-wget  --trust-server-names http://{NODE_IP}:8899/genesis.tar.bz2 -O{LEDGER_FOLDER_PATH}
+wget  --trust-server-names http://{NODE_IP}:8899/genesis.tar.bz2 -OP{LEDGER_FOLDER_PATH}
