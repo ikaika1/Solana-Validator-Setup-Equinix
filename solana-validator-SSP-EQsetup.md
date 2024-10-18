@@ -108,6 +108,51 @@ sudo chown -R sol:sol /mnt/*
 sudo chown sol:sol ~/log
 ```
 
+```
+# mdadm のインストール
+sudo apt update
+sudo apt install mdadm
+
+# 既存のファイルシステム署名を消去
+sudo wipefs -a /dev/nvme0n1
+sudo wipefs -a /dev/nvme1n1
+
+# （オプション）gdisk を使用して既存のパーティションを削除
+sudo gdisk /dev/nvme0n1
+# 'o' を押して新しい GPT を作成し、'w' を押して変更を保存
+sudo gdisk /dev/nvme1n1
+# 'o' を押して新しい GPT を作成し、'w' を押して変更を保存
+
+# RAID0 アレイの作成
+sudo mdadm --create --verbose /dev/md0 --level=0 --raid-devices=2 /dev/nvme0n1 /dev/nvme1n1
+
+# RAID 作成の監視
+cat /proc/mdstat
+sudo mdadm --detail /dev/md0
+
+# ファイルシステムの作成
+sudo mkfs.ext4 /dev/md0
+
+# アレイのマウント
+sudo mkdir /mnt/raid0
+sudo mount /dev/md0 /mnt/raid0
+
+# UUID の取得
+sudo blkid /dev/md0
+
+# /etc/fstab の編集
+sudo nano /etc/fstab
+# 以下の行を追加（UUID を実際のものに置き換え）
+UUID=your-uuid-here  /mnt/raid0  ext4  defaults  0  0
+
+# RAID 設定の保存
+sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf
+sudo update-initramfs -u
+
+# システムの再起動
+sudo reboot
+```
+
 Set up the firewall / ssh
 ```
 sudo snap install ufw
