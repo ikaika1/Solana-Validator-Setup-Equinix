@@ -453,3 +453,10 @@ solana validator-info publish "SomethingCreative" -n SomethingCreative -w "https
 Install a monitoring stack of your choice. There are many great public guides. For example, look up Ubuntu `TIG` motoring stack how to guide. TIG stand for Telegraf, InfluxDB, Grafana.
 
 Join the Solana Discord channel for validator support! 
+
+Solanaクライアントのバージョンによっては、互換性がない場合があります。現在インストールされているバージョンと同じバージョンでスナップショット検索をフィルタリングしてみてください。私は長い間Solanaバリデーターをしていませんし、これをチェックするための独自のノードもありません。
+このフラグを試すことができます。
+--version VERSION     search for a snapshot from a specific version node 
+
+動作しない場合は、クライアント バージョンと互換性のある RPC を検索し、手動でダウンロードできます (たとえば、wget を使用) — https://solana.rpc-finder.com/
+wget  --trust-server-names http://{NODE_IP}:8899/genesis.tar.bz2 -O{LEDGER_FOLDER_PATH}
