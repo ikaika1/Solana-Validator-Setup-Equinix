@@ -491,3 +491,62 @@ Solanaクライアントのバージョンによっては、互換性がない�
 
 動作しない場合は、クライアント バージョンと互換性のある RPC を検索し、手動でダウンロードできます (たとえば、wget を使用) — https://solana.rpc-finder.com/
 wget  --trust-server-names http://{NODE_IP}:8899/genesis.tar.bz2 -OP{LEDGER_FOLDER_PATH}
+
+移行
+```
+ssh-keygen -t rsa -b 4096 
+sudo cat ~/.ssh/id_rsa.pub
+
+mkdir .ssh 
+touch .ssh/authorized_keys
+
+sudo nano .ssh/authorized_keys
+
+# ホームディレクトリの所有者を 'sol' ユーザーに設定
+sudo chown sol:sol /home/sol
+
+# ホームディレクトリのパーミッションを 755 に設定（必要に応じて 750 でも可）
+sudo chmod 755 /home/sol
+
+
+```
+
+
+
+
+Active Validator
+Wait for a restart window
+
+Set identity to unstaked "junk" identity
+
+Correct symbolic link to reflect this change
+
+Copy the tower file to the inactive validator
+
+Copy
+
+
+
+active-to-inactive.sh
+```
+#!/bin/bash
+
+# example script of the above steps - change IP obviously
+solana-validator -l /mnt/ledger wait-for-restart-window --min-idle-time 2 --skip-new-snapshot-check
+solana-validator -l /mnt/ledger set-identity /home/sol/unstaked-identity.json
+ln -sf /home/sol/unstaked-identity.json /home/sol/identity.json
+scp /mnt/ledger/tower-1_9-$(solana-keygen pubkey /home/sol/staked-identity.json).bin sol@68.100.100.10:/mnt/ledger
+
+```
+Inactive Validator
+Set identity to your staked identity (requiring the tower)
+
+Rewrite symbolic link to reflect this
+
+Copy
+inactive-to-active.sh
+```
+#!/bin/bash
+solana-validator -l /mnt/ledger set-identity --require-tower /home/sol/staked-identity.json
+ln -sf /home/sol/staked-identity.json /home/sol/identity.json
+```
