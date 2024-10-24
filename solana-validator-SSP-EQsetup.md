@@ -291,6 +291,13 @@ solana vote-update-commission ~/vote-account-keypair.json 10 ~/authority-keypair
 
 ### Making system services (sol.service and systuner.service) and the startup script.   
 
+
+```
+echo 'vm.swappiness=1' | sudo tee --append /etc/sysctl.conf > /dev/null
+
+sudo sysctl -p
+```
+
 solana-validator shell script
 ```
 sudo nano ~/start-validator.sh
